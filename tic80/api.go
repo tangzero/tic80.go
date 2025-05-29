@@ -5,6 +5,25 @@ import (
 	"unsafe"
 )
 
+//go:wasmimport env mouse
+func mouse(data uint32)
+
+type mouseData struct {
+	x       int16
+	y       int16
+	scrollx int8
+	scrolly int8
+	left    bool
+	middle  bool
+	right   bool
+}
+
+func Mouse() (x, y int16, left, middle, right bool, scrollX, scrollY int8) {
+	var data mouseData
+	mouse(uint32(uintptr((unsafe.Pointer(&data)))))
+	return data.x, data.y, data.left, data.middle, data.right, data.scrollx, data.scrolly
+}
+
 //go:wasmimport env print
 func print(text uint32, x uint32, y uint32, color uint32, fixed bool, scale uint32, smallfont bool) uint32
 
