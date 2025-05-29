@@ -1,11 +1,26 @@
-# TARGET ?= wasm
+NAME = example
+WASM = out/$(NAME).wasm
 TARGET = target.json
+IMPORT_WASM = load cart.wasmp & import binary $(WASM) & save
 
-cart.wasm: main.go
-	tinygo build -target $(TARGET) -o cart.wasm .
+$(WASM): main.go
+	tinygo build -target $(TARGET) -o $@ .
 
-run: cart.wasm
-	tic80 --fs . --cmd 'load cart.wasmp & import binary cart.wasm & save & run'
+run: $(WASM)
+	tic80 --fs . --cmd '$(IMPORT_WASM) & run'
+
+export-mac: $(WASM)
+	mkdir -p out/mac
+	tic80 --fs . --cli --cmd '$(IMPORT_WASM) & export mac out/mac/$(NAME) & exit'
+
+export-linux: $(WASM)
+	mkdir -p out/linux
+	tic80 --fs . --cli --cmd '$(IMPORT_WASM) & export linux out/linux/$(NAME) & exit'
+
+export-win: $(WASM)
+	mkdir -p out/win
+	tic80 --fs . --cli --cmd '$(IMPORT_WASM) & export win out/win/$(NAME) & exit'
 
 clean:
-	rm -f cart.wasm
+	rm -rf .local $(WASM) $(NAME)
+
