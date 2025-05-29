@@ -1,6 +1,7 @@
 package tic80
 
 import (
+	"fmt"
 	"runtime"
 	"unsafe"
 )
@@ -34,6 +35,10 @@ func Print(text string, x uint32, y uint32, color uint32, fixed bool, scale uint
 	return ret
 }
 
+func Printf(format string, x uint32, y uint32, color uint32, fixed bool, scale uint32, smallfont bool, args ...any) uint32 {
+	return Print(fmt.Sprintf(format, args...), x, y, color, fixed, scale, smallfont)
+}
+
 //go:wasmimport env trace
 func trace(text, color uint32)
 
@@ -41,6 +46,10 @@ func Trace(text string, color uint32) {
 	ptr := stringToPtr(text)
 	trace(ptr, color)
 	runtime.KeepAlive(text)
+}
+
+func Tracef(format string, color uint32, args ...any) {
+	Trace(fmt.Sprintf(format, args...), color)
 }
 
 //go:wasmimport env rect
